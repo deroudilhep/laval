@@ -18,7 +18,7 @@ Second, *laval* needs *youtube-dl*. You can find it [here](https://github.com/yt
 
 ### Installing *laval*
 
-Download `laval` file, put it somewhere your `$PATH` is looking for (for Ubuntu, there must be a `~/.local/bin` or something like that), then open your terminal and there you go! 
+Download `laval` file, put it somewhere your `$PATH` is leading to (for Ubuntu, there must be a `~/.local/bin` or something like that), then open your terminal and there you go!
 
 ## Support
 

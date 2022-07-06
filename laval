@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# This program takes one or several youtube channels url as an input and output those channels' total video duration
+# Requirements: R and packages tidyverse, lubridate, readr ; youtube-dl
+# Author: deroudilhep https://github.com/deroudilhep
+
+if [ $# -eq 0 ]
+then
+	echo "Welcome in laval. Please provide some YouTube channels' URLs as arguments."
+	echo "laval [URL] ([URL] ...)"
+else
+	echo "Retrieving durations, please wait (this could take several minutes)."
+	for url in "$@"
+	do
+		youtube-dl --get-duration $url >> video-duration.csv
+	done
+	echo "Durations retrievied! Lauching calculations within R. Please wait."
+	Rscript -e 'library(tidyverse)
+	library(lubridate)
+	library(readr)
+	video_duration <- read_csv("video-duration.csv", col_names = FALSE, col_types = cols(X1 = col_character())) %>%
+	mutate(X1 = gsub("60:00", "1:00:00", X1)) %>%
+	mutate(X1 = parse_date_time(X1, c("HMS", "MS", "S"))) %>%
+	mutate(X1 = as.character(X1)) %>%
+	mutate(X1 = gsub("0-01-01 ", "", X1)) %>%
+	mutate(X1 = hms(X1)) %>%
+	mutate(X1 = as.duration(X1))
+	total_time_seconds <- sum(video_duration[1])
+	total_time_hours <- round(total_time_seconds/3600)
+	cat(paste("Total video duration is", total_time_hours, "hours."), file="output.txt")' > tmp.txt 2>&1
+	echo $(cat output.txt)
+	rm video-duration.csv
+	rm tmp.txt
+	rm output.txt
+fi
